@@ -1,0 +1,10 @@
+{
+  "name": "TumInjector",
+  "version": "1.0.0",
+  "description": "Development tool: injects one synthetic TUM for runtime testing.",
+  "exeLocation": "/var/www/plugins/TumInjector/TumInjector",
+  "coreIpAddr": "127.0.0.1",
+  "corePort": 24601,
+  "messageTypes": [],
+  "configuration": []
+}

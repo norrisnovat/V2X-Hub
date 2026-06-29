@@ -1,0 +1,175 @@
+{
+  "name": "TollPlugin",
+  "version": "3.0.0",
+  "description": "SAE J3217 Electronic Toll Collection plugin for V2X Hub. Broadcasts TollAdvertisementMessage (TAM), receives and validates TollUsageMessage (TUM), creates transactions, and sends TollUsageAckMessage (TumAck). Phase 2: JSON encoding. Phase 3: ASN.1 + IEEE 1609.2.",
+  "exeLocation": "/bin/TollPlugin",
+  "coreIpAddr": "127.0.0.1",
+  "corePort": 24601,
+
+  "messageTypes": [
+    {
+      "name": "TollAdvertisementMessage",
+      "type": "J3217",
+      "subtype": "TAM",
+      "direction": "produces",
+      "description": "Toll zone advertisement broadcast to OBEs at TamBroadcastIntervalMs"
+    },
+    {
+      "name": "TollUsageMessage",
+      "type": "J3217",
+      "subtype": "TUM",
+      "direction": "consumes",
+      "description": "Toll usage report from OBE after gantry crossing. Validated before transaction."
+    },
+    {
+      "name": "TollUsageAckMessage",
+      "type": "J3217",
+      "subtype": "TumAck",
+      "direction": "produces",
+      "description": "Acknowledgment of TUM processing (accepted or rejected with reason code)."
+    }
+  ],
+
+  "configuration": [
+    {
+      "key": "TollPointID",
+      "default": "camden-nj-001",
+      "description": "J3217 TollPointID — globally unique toll point identifier"
+    },
+    {
+      "key": "TollChargerID",
+      "default": "camden-rse-01",
+      "description": "J3217 TollChargerID — identifies this RSE charger unit"
+    },
+    {
+      "key": "TollPointName",
+      "default": "Camden Toll Plaza",
+      "description": "Human-readable toll point name (admin display only)"
+    },
+    {
+      "key": "RefLatDeg",
+      "default": "39.910664",
+      "description": "WGS84 reference latitude of toll point (decimal degrees)"
+    },
+    {
+      "key": "RefLonDeg",
+      "default": "-75.031281",
+      "description": "WGS84 reference longitude of toll point (decimal degrees)"
+    },
+    {
+      "key": "TamBroadcastIntervalMs",
+      "default": "1000",
+      "description": "TAM broadcast period in milliseconds (minimum 100)"
+    },
+    {
+      "key": "TamValidityWindowSec",
+      "default": "10",
+      "description": "Seconds added to broadcast time to set TAM validUntilUtc"
+    },
+    {
+      "key": "TumDeduplicationWindowS",
+      "default": "5",
+      "description": "Seconds within which a repeated (tempID, tumSequenceNum) is a duplicate"
+    },
+    {
+      "key": "MaxTamHistorySize",
+      "default": "128",
+      "description": "Maximum number of recent TAM msgCounts retained for TUM validation"
+    },
+    {
+      "key": "ValidLaneIDs",
+      "default": "1,2,3,4,5,6,7,8,9,10,11,12,13",
+      "description": "Comma-separated gantry lane IDs accepted in TUM (Camden: 1-13)"
+    },
+    {
+      "key": "RatePassengerCar",
+      "default": "5.00",
+      "description": "Toll rate USD for J3217 passenger_car vehicle class"
+    },
+    {
+      "key": "RateHeavyVehicle",
+      "default": "10.00",
+      "description": "Toll rate USD for J3217 heavy_vehicle vehicle class"
+    },
+    {
+      "key": "RateBus",
+      "default": "7.50",
+      "description": "Toll rate USD for J3217 bus vehicle class"
+    },
+    {
+      "key": "TransactionLogPath",
+      "default": "/var/log/TollPlugin/v2xhub_toll_transactions.jsonl",
+      "description": "Absolute path for accepted transaction JSONL log"
+    },
+    {
+      "key": "AuditLogPath",
+      "default": "/var/log/TollPlugin/audit.jsonl",
+      "description": "Absolute path for audit JSONL log (all TUMs: accepted + rejected)"
+    },
+    {
+      "key": "SecurityMode",
+      "default": "PHASE2_NO_SECURITY",
+      "description": "PHASE2_NO_SECURITY (no cert checks) or PHASE3_SCMS (full IEEE 1609.2)"
+    },
+    {
+      "key": "CertificateStorePath",
+      "default": "/etc/v2x/certs/",
+      "description": "Phase 3: directory for SCMS enrollment and authorization certificates"
+    },
+    {
+      "key": "LogLevel",
+      "default": "INFO",
+      "description": "Log verbosity: ERROR WARN INFO DEBUG DEBUG1 DEBUG2 DEBUG3 DEBUG4"
+    },
+    {
+      "key": "LogOutput",
+      "default": "-",
+      "description": "Log file path, or - for stdout (default)"
+    },
+    {
+      "key": "TamRouteMode",
+      "default": "INTERNAL",
+      "description": "INTERNAL: put TAM on internal TMX bus only (dev/test). DSRC: also forward to DSRC radio."
+    },
+    {
+      "key": "MessageEncodingMode",
+      "default": "JSON",
+      "description": "JSON: standard JSON encoding. J3217_UPER: ASN.1 UPER binary encoding. DUAL: broadcast both simultaneously with field comparison."
+    },
+    {
+      "key": "EnableUdpInterface",
+      "default": "false",
+      "description": "Enable direct UDP interface for VISSIM/OBU simulation."
+    },
+    {
+      "key": "UdpBindHost",
+      "default": "0.0.0.0",
+      "description": "Local IPv4 address for TollPlugin UDP TUM listener."
+    },
+    {
+      "key": "TamUdpPort",
+      "default": "5001",
+      "description": "UDP destination port used to send TAM messages to the OBE/VISSIM host."
+    },
+    {
+      "key": "TumUdpPort",
+      "default": "5002",
+      "description": "UDP port TollPlugin listens on for TUM messages from the OBE/VISSIM host."
+    },
+    {
+      "key": "TumAckUdpPort",
+      "default": "5003",
+      "description": "UDP destination port used to send TumAck messages to the OBE/VISSIM host."
+    },
+    {
+      "key": "ObeHost",
+      "default": "10.0.0.2",
+      "description": "IPv4 address of the OBE/VISSIM host that receives TAM and TumAck UDP packets."
+    },
+    {
+      "key": "UdpEncodingMode",
+      "default": "JSON",
+      "description": "UDP payload encoding: JSON, J3217_UPER, or DUAL."
+    }
+  ]
+}
